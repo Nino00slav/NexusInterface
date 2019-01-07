@@ -99,6 +99,10 @@ const Navigation = () => (
         &nbsp;
         <Text id="Footer.List" />
       </NavItem>
+
+      <NavItem icon={shapeshiftIcon} to="/ModMarket">
+        <span>Mod Market</span>
+      </NavItem>
     </NavBar>
   </Nav>
 );

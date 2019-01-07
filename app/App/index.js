@@ -26,6 +26,7 @@ import About from './About';
 import Exchange from './Exchange';
 import AppBackground from './AppBackground';
 import ThemeController from './ThemeController';
+import ModMarket from './ModMarket';
 
 const AppWrapper = styled.div({
   position: 'fixed',
@@ -99,6 +100,7 @@ export default class App extends Component {
                       <Route path="/Exchange" component={Exchange} />
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
+                      <Route exact path="/ModMarket" component={ModMarket} />
                     </Switch>
                   </Main>
                   <Navigation />
