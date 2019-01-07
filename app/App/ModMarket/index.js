@@ -27,8 +27,8 @@ export default class ModMarket extends Component {
   render() {
     return (
       <Panel icon={chartIcon} title={<Text id="Market.Information" />}>
-        <button onClick={() => this.importTest()}>Import the Moduels</button>
-        {Testimport && <Testimport />}
+        <button onClick={() => this.importTest()}>Import Da Module!</button>
+        {Testimport && <Testimport thisthing="Look at these props!" />}
       </Panel>
     );
   }
