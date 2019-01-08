@@ -590,7 +590,7 @@ class AddressBook extends Component {
             this.loadMyAccounts();
           })
           .catch(e => {
-            UIController.openErrorModal({ message: e });
+            UIController.openErrorDialog({ message: e });
           });
       } else {
         UIController.showNotification(
@@ -605,7 +605,7 @@ class AddressBook extends Component {
           this.loadMyAccounts();
         })
         .catch(e => {
-          UIController.openErrorModal({ message: e });
+          UIController.openErrorDialog({ message: e });
         });
     }
   }
@@ -1075,7 +1075,7 @@ class AddressBook extends Component {
         icon={addressBookIcon}
         title={<Text id="AddressBook.AddressBook" />}
         controls={
-          !!this.props.connections && (
+          this.props.connections !== undefined && (
             <div className="flex center">
               <Tooltip.Trigger tooltip={<Text id="AddressBook.addContact" />}>
                 <Button

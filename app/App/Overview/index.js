@@ -1,35 +1,20 @@
-/*
-  Title: Overview
-  Description: the landing page for the application.
-  Last Modified by: Brian Smith
-*/
-// External Dependencies
+// External
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Modal from 'react-responsive-modal';
 import * as TYPE from 'actions/actiontypes';
-import { NavLink } from 'react-router-dom';
 import { remote } from 'electron';
-import Request from 'request';
 import Text from 'components/Text';
-import fs from 'fs';
-import path from 'path';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/core';
 import googleanalytics from 'scripts/googleanalytics';
 
-// Internal Global Dependencies
+// Internal
 import Icon from 'components/Icon';
 import Tooltip from 'components/Tooltip';
-import WEBGL from 'scripts/WebGLCheck.js';
-import { GetSettings, SaveSettings } from 'api/settings';
 import ContextMenuBuilder from 'contextmenu';
 import * as helpers from 'scripts/helper.js';
-import configuration from 'api/configuration';
 import { timing, consts } from 'styles';
-
-// Internal Local Dependencies
 import NetworkGlobe from './NetworkGlobe';
 
 // Images
@@ -72,6 +57,33 @@ import interestIcon from 'images/interest.sprite.svg';
 import stakeIcon from 'images/staking-white.sprite.svg';
 import maxmindLogo from 'images/maxmind-header-logo-compact.svg';
 
+const trustIcons = [
+  trust00,
+  trust10,
+  trust20,
+  trust30,
+  trust40,
+  trust50,
+  trust60,
+  trust70,
+  trust80,
+  trust90,
+  trust100,
+];
+
+const blockWeightIcons = [
+  blockweight0,
+  blockweight1,
+  blockweight2,
+  blockweight3,
+  blockweight4,
+  blockweight5,
+  blockweight6,
+  blockweight7,
+  blockweight8,
+  blockweight9,
+];
+
 // React-Redux mandatory methods
 const mapStateToProps = state => {
   return {
@@ -89,8 +101,6 @@ const mapDispatchToProps = dispatch => ({
   toggleSave: () => dispatch({ type: TYPE.TOGGLE_SAVE_SETTINGS_FLAG }),
   ignoreEncryptionWarning: () =>
     dispatch({ type: TYPE.IGNORE_ENCRYPTION_WARNING }),
-  setWebGLEnabled: isEnabled =>
-    dispatch({ type: TYPE.SET_WEBGL_ENABLED, payload: isEnabled }),
 });
 
 const OverviewPage = styled.div({
@@ -209,13 +219,6 @@ const MaxmindLogo = styled.img({
 class Overview extends Component {
   // React Method (Life cycle hook)
   componentDidMount() {
-    if (WEBGL.isWebGLAvailable()) {
-      this.props.setWebGLEnabled(true);
-    } else {
-      this.props.setWebGLEnabled(false);
-      var warning = WEBGL.getWebGLErrorMessage();
-      console.error(warning);
-    }
     window.addEventListener('contextmenu', this.setupcontextmenu, false);
 
     googleanalytics.SendScreen('Overview');
@@ -227,60 +230,37 @@ class Overview extends Component {
   }
 
   // React Method (Life cycle hook)
-  componentDidUpdate(previousprops) {
-    if (this.props.blocks > previousprops.blocks) {
-      let newDate = new Date();
-      this.props.BlockDate(newDate);
-    }
+  componentDidUpdate(prevProps) {
+    const {
+      blocks,
+      webGLEnabled,
+      settings,
+      connections,
+      percentDownloaded,
+    } = this.props;
 
-    if (this.props.saveSettingsFlag) {
-      SaveSettings(this.props.settings);
-    }
-
-    if (
-      this.props.webGLEnabled == false ||
-      this.props.settings.renderGlobe == false
-    ) {
-      return;
-    }
-
-    if (this.props.blocks != previousprops.blocks) {
-      if (this.props.blocks != 0 && previousprops.blocks != 0) {
+    if (webGLEnabled && settings.renderGlobe) {
+      if (blocks != prevProps.blocks && blocks && prevProps.blocks) {
         this.redrawCurves();
       }
-    }
 
-    if (
-      (this.props.connections == 0 ||
-        (this.props.connections == undefined &&
-          this.props.percentDownloaded == 0.001)) &&
-      this.props.daemonAvailable == false
-    ) {
-      this.removeAllPoints();
-      this.reDrawEverything();
-      return;
-    }
-
-    if (
-      this.props.settings.acceptedagreement !== false ||
-      this.props.settings.renderGlobe !== false ||
-      this.props.webGLEnabled !== false
-    ) {
       if (
-        (previousprops.connections == undefined ||
-          previousprops.connections == 0) &&
-        (this.props.connections != 0 || this.props.connections != undefined) &&
-        this.props.webGLEnabled !== false &&
-        this.props.settings.renderGlobe === true
+        connections === 0 ||
+        (connections === undefined && percentDownloaded == 0.001)
       ) {
-        //Daemon Starting Up
+        this.removeAllPoints();
         this.reDrawEverything();
-      } else {
+        return;
+      }
+
+      if (settings.acceptedagreement || settings.renderGlobe || webGLEnabled) {
         if (
-          this.props.connections != previousprops.connections &&
-          this.props.connections !== undefined &&
-          previousprops.connections !== undefined
+          (!prevProps.connections && connections) ||
+          (connections !== prevProps.connections &&
+            connections !== undefined &&
+            prevProps.connections !== undefined)
         ) {
+          //Daemon Starting Up
           this.reDrawEverything();
         }
       }
@@ -296,101 +276,17 @@ class Overview extends Component {
     defaultcontextmenu.popup(remote.getCurrentWindow());
   }
 
-  closeLicenseModal() {
-    this.props.acceptMITAgreement();
-  }
-
-  BlockRapper() {
-    if (this.props.blockDate === 'Getting Next Block...') {
+  blockDate() {
+    if (!this.props.blockDate) {
       return <Text id="ToolTip.GettingNextBlock" />;
     } else {
       return this.props.blockDate.toLocaleString(this.props.settings.locale);
     }
   }
 
-  returnLicenseModalInternal() {
-    let tempYear = new Date();
-
-    return (
-      <div>
-        The MIT License (MIT)
-        <br />
-        Copyright {tempYear.getFullYear()} Nexus
-        <br />
-        Permission is hereby granted, free of charge, to any person obtaining a
-        copy of this software and associated documentation files (the
-        "Software"), to deal in the Software without restriction, including
-        without limitation the rights to use, copy, modify, merge, publish,
-        distribute, sublicense, and/or sell copies of the Software, and to
-        permit persons to whom the Software is furnished to do so, subject to
-        the following conditions:
-        <br />
-        The above copyright notice and this permission notice shall be included
-        in all copies or substantial portions of the Software.
-        <br />
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-        <br />
-        <button
-          key="agreement-button-accept"
-          className="button primary"
-          onClick={() => this.closeLicenseModal()}
-        >
-          ACCEPT
-        </button>
-      </div>
-    );
-  }
-
-  returnExperimentalModalInternal() {
-    return (
-      <div>
-        <h4>
-          THIS SOFTWARE IS EXPERIMENTAL AND IN BETA TESTING. BY DEFAULT IT WILL
-          NOT USE ANY EXISTING NEXUS WALLET NOR ADDRESSES THAT YOU MAY ALREADY
-          HAVE.
-          <br />
-          <br />
-          AS SUCH, THIS WALLET SHOULD{' '}
-          <b>
-            <u>NOT </u>
-          </b>
-          BE USED AS YOUR PRIMARY WALLET AND DOING SO MAY AFFECT YOUR ABILITY TO
-          ACCESS YOUR COINS UP TO AND INCLUDING LOSING THEM PERMANENTLY.
-          <br />
-          <br />
-          USE THIS SOFTWARE AT YOUR OWN RISK.
-        </h4>
-        <br key="br2" />
-        <button
-          key="experiment-button-accept"
-          className="button"
-          onClick={() => this.props.setExperimentalWarning(false)}
-        >
-          OK
-        </button>
-        <button
-          key="experiment-button-noshow"
-          className="button"
-          onClick={() => this.props.setExperimentalWarning(true)}
-        >
-          Don't show this again
-        </button>
-      </div>
-    );
-  }
-
-  connectionsImage() {
+  connectionsIcon() {
     const con = this.props.connections;
-
-    if (con <= 4) {
-      return Connections0;
-    } else if (con > 4 && con <= 6) {
+    if (con > 4 && con <= 6) {
       return Connections4;
     } else if (con > 6 && con <= 12) {
       return Connections8;
@@ -405,89 +301,14 @@ class Overview extends Component {
     }
   }
 
-  trustImg() {
-    const TW = parseInt(this.props.trustweight / 10);
-    switch (TW) {
-      case 0:
-        return trust00;
-        break;
-      case 1:
-        return trust10;
-        break;
-      case 2:
-        return trust20;
-        break;
-      case 3:
-        return trust30;
-        break;
-      case 4:
-        return trust40;
-        break;
-      case 5:
-        return trust50;
-        break;
-      case 6:
-        return trust60;
-        break;
-      case 7:
-        return trust70;
-        break;
-      case 8:
-        return trust80;
-        break;
-      case 9:
-        return trust90;
-        break;
-      case 10:
-        return trust100;
-        break;
-      default:
-        return trust00;
-        break;
-    }
+  trustIcon() {
+    const tw = Math.round(this.props.trustweight / 10);
+    return trustIcons[tw];
   }
 
-  blockWeightImage() {
-    const BW = parseInt(this.props.blockweight / 10);
-    switch (BW) {
-      case 0:
-        return blockweight0;
-        break;
-      case 1:
-        return blockweight1;
-        break;
-      case 2:
-        return blockweight2;
-        break;
-      case 3:
-        return blockweight3;
-        break;
-      case 4:
-        return blockweight4;
-        break;
-      case 5:
-        return blockweight5;
-        break;
-      case 6:
-        return blockweight6;
-        break;
-      case 7:
-        return blockweight7;
-        break;
-      case 8:
-        return blockweight8;
-        break;
-      case 9:
-        return blockweight9;
-        break;
-      default:
-        return blockweight0;
-        break;
-    }
-  }
-
-  returnIfDrawLines() {
-    //if (testinglines == true)
+  blockWeightIcon() {
+    const bw = Math.round(this.props.blockweight / 10);
+    return blockWeightIcons[bw];
   }
 
   isGlobeEnabled() {
@@ -569,85 +390,18 @@ class Overview extends Component {
     }
   }
 
-  experimentalModalController() {
-    if (
-      this.props.settings.acceptedagreement &&
-      (this.props.settings.experimentalWarning && this.props.experimentalOpen)
-    ) {
-      return true;
-    } else return false;
-  }
-
-  encryptedModalController() {
-    if (
-      this.daemonAvailable &&
-      !this.props.experimentalOpen &&
-      this.props.settings.acceptedagreement &&
-      (!this.props.encrypted && !this.props.ignoreEncryptionWarningFlag)
-    ) {
-      return true;
-    } else return false;
-  }
+  waitForDaemon = stat =>
+    this.props.connections !== undefined ? (
+      stat
+    ) : (
+      <span className="dim">-</span>
+    );
 
   // Mandatory React method
   render() {
     const { connections, balance, stake, displayNXSvalues } = this.props;
     return (
       <OverviewPage>
-        <Modal
-          key="agreement-modal"
-          open={!this.props.settings.acceptedagreement}
-          onClose={() => true}
-          focusTrapped={true}
-          center
-          showCloseIcon={false}
-          classNames={{ modal: 'modal' }}
-        >
-          <div>
-            <h2>
-              {' '}
-              <Text id="overview.LicensceAgreement" />
-            </h2>
-            {this.returnLicenseModalInternal()}
-          </div>
-        </Modal>
-        <Modal
-          key="experiment-modal"
-          focusTrapped={true}
-          open={this.experimentalModalController()}
-          onClose={() => this.props.setExperimentalWarning(false)}
-          center
-          classNames={{ modal: 'modal' }}
-        >
-          {this.returnExperimentalModalInternal()}
-        </Modal>
-        <Modal
-          key="encrypted-modal"
-          open={this.encryptedModalController()}
-          onClose={() => this.props.ignoreEncryptionWarning()}
-          center
-          classNames={{ modal: 'modal' }}
-        >
-          <h3>
-            {' '}
-            <Text id="overview.EncryptedModal" />
-          </h3>
-          <p>
-            <Text id="overview.Suggestion" />
-          </p>
-          <NavLink to="/Settings/Unencrypted">
-            <button className="button primary">
-              <Text id="overview.TakeMeThere" />
-            </button>
-          </NavLink>
-          <button
-            className="button negative"
-            onClick={() => this.props.ignoreEncryptionWarning()}
-          >
-            <Text id="overview.Ignore" />{' '}
-          </button>
-        </Modal>
-
         {!!this.isGlobeEnabled() && (
           <>
             <NetworkGlobe
@@ -683,11 +437,7 @@ class Overview extends Component {
                 (NXS)
               </StatLabel>
               <StatValue>
-                {!!connections ? (
-                  balance + (stake || 0)
-                ) : (
-                  <span className="dim">-</span>
-                )}
+                {this.waitForDaemon(balance + (stake || 0))}
               </StatValue>
             </div>
             <StatIcon icon={nxsStakeIcon} />
@@ -703,11 +453,7 @@ class Overview extends Component {
                 {this.props.settings.fiatCurrency})
               </StatLabel>
               <StatValue>
-                {!!connections ? (
-                  this.calculateUSDvalue()
-                ) : (
-                  <span className="dim">-</span>
-                )}
+                {this.waitForDaemon(this.calculateUSDvalue())}
               </StatValue>
             </div>
             <StatIcon icon={usdIcon} />
@@ -721,13 +467,7 @@ class Overview extends Component {
               <StatLabel>
                 <Text id="overview.Transactions" />
               </StatLabel>
-              <StatValue>
-                {!!connections ? (
-                  this.props.txtotal
-                ) : (
-                  <span className="dim">-</span>
-                )}
-              </StatValue>
+              <StatValue>{this.waitForDaemon(this.props.txtotal)}</StatValue>
             </div>
             <StatIcon icon={transactionIcon} />
           </Stat>
@@ -795,17 +535,13 @@ class Overview extends Component {
 
         <Stats right compact={!this.isGlobeEnabled()}>
           <Stat>
-            <StatIcon icon={this.connectionsImage()} />
+            <StatIcon icon={this.connectionsIcon()} />
             <div>
               <StatLabel>
                 <Text id="overview.Connections" />
               </StatLabel>
               <StatValue>
-                {!!connections ? (
-                  this.props.connections
-                ) : (
-                  <span className="dim">-</span>
-                )}
+                {this.waitForDaemon(this.props.connections)}
               </StatValue>
             </div>
           </Stat>
@@ -817,16 +553,12 @@ class Overview extends Component {
                 <Text id="overview.InterestRate" />
               </StatLabel>
               <StatValue>
-                {!!connections ? (
-                  this.props.interestweight + '%'
-                ) : (
-                  <span className="dim">-</span>
-                )}
+                {this.waitForDaemon(this.props.interestweight + '%')}
               </StatValue>
             </div>
           </Stat>
 
-          <Tooltip.Trigger position="left" tooltip={this.BlockRapper()}>
+          <Tooltip.Trigger position="left" tooltip={this.blockDate()}>
             <Stat className="relative">
               <StatIcon icon={nxsblocksIcon} />
               <div>
@@ -835,44 +567,32 @@ class Overview extends Component {
                 </StatLabel>
 
                 <StatValue>
-                  {!!connections ? (
-                    this.numberWithCommas(this.props.blocks)
-                  ) : (
-                    <span className="dim">-</span>
-                  )}
+                  {this.waitForDaemon(this.numberWithCommas(this.props.blocks))}
                 </StatValue>
               </div>
             </Stat>
           </Tooltip.Trigger>
 
           <Stat>
-            <StatIcon icon={this.blockWeightImage()} />
+            <StatIcon icon={this.blockWeightIcon()} />
             <div>
               <StatLabel>
                 <Text id="overview.BlockWeightt" />
               </StatLabel>
               <StatValue>
-                {!!connections ? (
-                  this.props.blockweight
-                ) : (
-                  <span className="dim">-</span>
-                )}
+                {this.waitForDaemon(this.props.blockweight)}
               </StatValue>
             </div>
           </Stat>
 
           <Stat>
-            <StatIcon icon={this.trustImg()} />
+            <StatIcon icon={this.trustIcon()} />
             <div>
               <StatLabel>
                 <Text id="overview.TrustWeight" />
               </StatLabel>
               <StatValue>
-                {!!connections ? (
-                  this.props.trustweight
-                ) : (
-                  <span className="dim">-</span>
-                )}
+                {this.waitForDaemon(this.props.trustweight)}
               </StatValue>
             </div>
           </Stat>
@@ -884,11 +604,7 @@ class Overview extends Component {
                 <Text id="overview.StakeWeight" />
               </StatLabel>
               <StatValue>
-                {!!connections ? (
-                  this.props.stakeweight
-                ) : (
-                  <span className="dim">-</span>
-                )}
+                {this.waitForDaemon(this.props.stakeweight)}
               </StatValue>
             </div>
           </Stat>
