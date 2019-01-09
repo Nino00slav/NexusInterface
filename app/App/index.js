@@ -5,7 +5,10 @@ import { Route, Switch } from 'react-router';
 import { Provider } from 'react-redux';
 // import IntlWrapper from './IntlWrapper';
 import styled from '@emotion/styled';
-
+//needed for module loading
+import { join } from 'path';
+import configuration from 'api/configuration';
+import { readdirSync, Stats, lstatSync, readFileSync } from 'fs';
 // Internal
 import UIController from 'components/UIController';
 import GlobalStyles from './GlobalStyles';
@@ -59,8 +62,78 @@ const AppLoader = styled.div({
 });
 
 export default class App extends Component {
+  ModulePreloadChecker() {
+    const moduleInstallDir = join(
+      configuration.GetAppDataDirectory(),
+      'Installed_Modules'
+    );
+    const rawInstalled = readdirSync(moduleInstallDir);
+    let elegeableInstalled = [];
+    if (rawInstalled.length > 0) {
+      elegeableInstalled = rawInstalled
+        .filter(e => {
+          console.log();
+          if (lstatSync(join(moduleInstallDir, e)).isDirectory()) {
+            let currentMod = readdirSync(join(moduleInstallDir, e));
+            if (
+              currentMod.includes('index.js') &&
+              currentMod.includes('package.json') &&
+              currentMod.findIndex(e => {
+                if (e.includes('icon')) return e;
+              }) >= 0
+              // this is where we can make validations happen for modules
+            ) {
+              console.log('Valid Module');
+              return e;
+            } else {
+              console.log('Invalid Module, Skipping...');
+            }
+          } else {
+            console.log('Not a Module, Skipping...');
+          }
+        })
+        .map(mod => {
+          // Pulling out relevent information
+          let packageDOTjson = JSON.parse(
+            readFileSync(join(moduleInstallDir, mod, 'package.json'))
+          );
+          let moduleFiles = readdirSync(join(moduleInstallDir, mod));
+
+          console.log(packageDOTjson);
+          return {
+            routePath: `/${mod}-${packageDOTjson.productName}-${
+              packageDOTjson.version
+            }`.replace(' ', '-'),
+            name: packageDOTjson.productName,
+            version: packageDOTjson.version,
+            buildDate: packageDOTjson.buildDate,
+            entryFilePath: join(moduleInstallDir, mod, 'index.js'),
+            iconPath: join(
+              moduleInstallDir,
+              mod,
+              moduleFiles[
+                moduleFiles.findIndex(e => {
+                  if (e.includes('icon')) return e;
+                })
+              ]
+            ),
+          };
+        });
+      console.log(elegeableInstalled);
+    } else {
+      console.log('Install Directory is empty.');
+    }
+    this.props.store.dispatch({
+      type: 'ENABLED_MODULES',
+      payload: elegeableInstalled,
+    });
+    return elegeableInstalled;
+  }
+
   render() {
     const { store, history } = this.props;
+    const InstalledModules = this.ModulePreloadChecker();
+    console.log(store);
     return (
       <Provider store={store}>
         <ThemeController>
@@ -101,6 +174,16 @@ export default class App extends Component {
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
                       <Route exact path="/ModMarket" component={ModMarket} />
+                      {InstalledModules.map(e => {
+                        return (
+                          <Route
+                            key={e.routePath}
+                            exact
+                            path={e.routePath}
+                            component={global.require(e.entryFilePath).default}
+                          />
+                        );
+                      })}
                     </Switch>
                   </Main>
                   <Navigation />

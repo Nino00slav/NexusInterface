@@ -19,7 +19,7 @@ export default class ModMarket extends Component {
       fs.readdirSync(configuration.GetAppDataDirectory() + '/testModules')
     );
     Testimport = global.require(
-      configuration.GetAppDataDirectory() + '/testModules/Tester.js'
+      '/home/dillon/.config/Nexus_Wallet_BETA_v0.8.4/Installed_Modules/Tester/index.js'
     ).default;
     console.log(Testimport);
     this.forceUpdate();

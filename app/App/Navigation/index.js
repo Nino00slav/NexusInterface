@@ -1,6 +1,7 @@
 // External Dependencies
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+// import { NavLink } from 'react-router-dom';
+import { connect } from 'react-redux';
 import Text from 'components/Text';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/core';
@@ -51,60 +52,76 @@ const AboveNav = styled.div({
   right: 0,
 });
 
-const Navigation = () => (
-  <Nav>
-    <AboveNav>
-      <HorizontalLine />
-    </AboveNav>
+const mapStateToProps = state => {
+  return { enabledModules: state.common.enabledModules };
+};
 
-    <NavBar>
-      <NavItem icon={logoIcon} exact to="/">
-        <Text id="Footer.Overview" />
-      </NavItem>
+class Navigation extends Component {
+  render() {
+    console.log(this.props);
+    return (
+      <Nav>
+        <AboveNav>
+          <HorizontalLine />
+        </AboveNav>
 
-      <NavItem icon={sendIcon} to="/SendPage">
-        Send NXS
-      </NavItem>
+        <NavBar>
+          <NavItem icon={logoIcon} exact to="/">
+            <Text id="Footer.Overview" />
+          </NavItem>
 
-      <NavItem icon={transactionsIcon} to="/Transactions">
-        <Text id="Footer.Transactions" />
-      </NavItem>
+          <NavItem icon={sendIcon} to="/SendPage">
+            Send NXS
+          </NavItem>
 
-      <NavItem icon={chartIcon} to="/Market">
-        <Text id="Footer.Market" />
-        &nbsp;
-        <Text id="Footer.Data" />
-      </NavItem>
+          <NavItem icon={transactionsIcon} to="/Transactions">
+            <Text id="Footer.Transactions" />
+          </NavItem>
 
-      <NavItem icon={addressBookIcon} to="/AddressBook">
-        <Text id="Footer.Address" />
-        &nbsp;
-        <Text id="Footer.Book" />
-      </NavItem>
+          <NavItem icon={chartIcon} to="/Market">
+            <Text id="Footer.Market" />
+            &nbsp;
+            <Text id="Footer.Data" />
+          </NavItem>
 
-      <NavItem icon={settingsIcon} to="/Settings">
-        <Text id="Footer.Settings" />
-      </NavItem>
+          <NavItem icon={addressBookIcon} to="/AddressBook">
+            <Text id="Footer.Address" />
+            &nbsp;
+            <Text id="Footer.Book" />
+          </NavItem>
 
-      <NavItem icon={consoleIcon} to="/Terminal">
-        <Text id="Footer.Console" />
-      </NavItem>
+          <NavItem icon={settingsIcon} to="/Settings">
+            <Text id="Footer.Settings" />
+          </NavItem>
 
-      <NavItem icon={shapeshiftIcon} to="/Exchange">
-        <Text id="Footer.Exchange" />
-      </NavItem>
+          <NavItem icon={consoleIcon} to="/Terminal">
+            <Text id="Footer.Console" />
+          </NavItem>
 
-      <NavItem icon={trustListIcon} to="/List">
-        <Text id="Footer.Trust" />
-        &nbsp;
-        <Text id="Footer.List" />
-      </NavItem>
+          <NavItem icon={shapeshiftIcon} to="/Exchange">
+            <Text id="Footer.Exchange" />
+          </NavItem>
 
-      <NavItem icon={shapeshiftIcon} to="/ModMarket">
-        <span>Mod Market</span>
-      </NavItem>
-    </NavBar>
-  </Nav>
-);
+          <NavItem icon={trustListIcon} to="/List">
+            <Text id="Footer.Trust" />
+            &nbsp;
+            <Text id="Footer.List" />
+          </NavItem>
 
-export default Navigation;
+          <NavItem icon={shapeshiftIcon} to="/ModMarket">
+            <span>Mod Market</span>
+          </NavItem>
+          {this.props.enabledModules.map(e => {
+            return (
+              <NavItem key={e.routePath} icon={shapeshiftIcon} to={e.routePath}>
+                <span>{e.name}</span>
+              </NavItem>
+            );
+          })}
+        </NavBar>
+      </Nav>
+    );
+  }
+}
+
+export default connect(mapStateToProps)(Navigation);

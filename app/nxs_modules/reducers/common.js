@@ -26,6 +26,7 @@ const initialState = {
   displayNXSvalues: [],
   BootstrapModal: false,
   encryptionModalShown: false,
+  enabledModules: [],
 };
 
 export default (state = initialState, action) => {
@@ -34,6 +35,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         loggedIn: false,
+      };
+      break;
+    case TYPE.ENABLED_MODULES:
+      return {
+        ...state,
+        enabledModules: action.payload,
       };
       break;
     case TYPE.TOGGLE_MODAL_VIS_STATE:
