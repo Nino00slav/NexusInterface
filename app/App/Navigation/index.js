@@ -108,12 +108,18 @@ class Navigation extends Component {
             <Text id="Footer.List" />
           </NavItem>
 
-          <NavItem icon={shapeshiftIcon} to="/ModMarket">
+          {/* <NavItem icon={shapeshiftIcon} to="/ModMarket">
             <span>Mod Market</span>
-          </NavItem>
+          </NavItem> */}
           {this.props.enabledModules.map(e => {
+            // console.log(global.require(e.iconPath).default);
+
             return (
-              <NavItem key={e.routePath} icon={shapeshiftIcon} to={e.routePath}>
+              <NavItem
+                key={e.routePath}
+                icon={{ path: e.iconPath }}
+                to={e.routePath}
+              >
                 <span>{e.name}</span>
               </NavItem>
             );

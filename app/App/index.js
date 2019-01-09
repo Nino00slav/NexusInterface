@@ -99,7 +99,6 @@ export default class App extends Component {
           );
           let moduleFiles = readdirSync(join(moduleInstallDir, mod));
 
-          console.log(packageDOTjson);
           return {
             routePath: `/${mod}-${packageDOTjson.productName}-${
               packageDOTjson.version
@@ -173,8 +172,9 @@ export default class App extends Component {
                       <Route path="/Exchange" component={Exchange} />
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
-                      <Route exact path="/ModMarket" component={ModMarket} />
+                      {/* <Route exact path="/ModMarket" component={ModMarket} /> */}
                       {InstalledModules.map(e => {
+                        console.log(e);
                         return (
                           <Route
                             key={e.routePath}
