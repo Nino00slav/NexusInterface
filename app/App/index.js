@@ -9,6 +9,9 @@ import styled from '@emotion/styled';
 import { join } from 'path';
 import configuration from 'api/configuration';
 import { readdirSync, Stats, lstatSync, readFileSync } from 'fs';
+import ShadowDOM from 'react-shadow';
+import ErrorBoundry from 'components/ErrorBoundry';
+
 // Internal
 import UIController from 'components/UIController';
 import GlobalStyles from './GlobalStyles';
@@ -72,9 +75,16 @@ export default class App extends Component {
     if (rawInstalled.length > 0) {
       elegeableInstalled = rawInstalled
         .filter(e => {
-          console.log();
           if (lstatSync(join(moduleInstallDir, e)).isDirectory()) {
             let currentMod = readdirSync(join(moduleInstallDir, e));
+            console.log(
+              e,
+              currentMod.includes('index.js'),
+              currentMod.includes('package.json'),
+              currentMod.findIndex(e => {
+                if (e.includes('icon')) return e;
+              })
+            );
             if (
               currentMod.includes('index.js') &&
               currentMod.includes('package.json') &&
@@ -172,16 +182,43 @@ export default class App extends Component {
                       <Route path="/Exchange" component={Exchange} />
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
-                      {/* <Route exact path="/ModMarket" component={ModMarket} /> */}
+                      {/* component={ModMarket} */}
+                      <Route
+                        exact
+                        path="/ModMarket"
+                        render={props => {
+                          return (
+                            <ShadowDOM {...props}>
+                              <div>Hello World</div>
+                            </ShadowDOM>
+                          );
+                        }}
+                      />
                       {InstalledModules.map(e => {
                         console.log(e);
+
+                        console.log(
+                          '--------------------------------',
+                          e.entryFilePath,
+                          global.require(e.entryFilePath)
+                        );
+                        let ThisModule = global.require(e.entryFilePath)
+                          .default;
                         return (
-                          <Route
-                            key={e.routePath}
-                            exact
-                            path={e.routePath}
-                            component={global.require(e.entryFilePath).default}
-                          />
+                          <ErrorBoundry>
+                            <ShadowDOM>
+                              <div>
+                                <Route
+                                  key={e.routePath}
+                                  exact
+                                  path={e.routePath}
+                                  render={props => {
+                                    return <ThisModule {...props} />;
+                                  }}
+                                />
+                              </div>
+                            </ShadowDOM>
+                          </ErrorBoundry>
                         );
                       })}
                     </Switch>
