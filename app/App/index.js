@@ -11,6 +11,7 @@ import configuration from 'api/configuration';
 import { readdirSync, Stats, lstatSync, readFileSync } from 'fs';
 import ShadowDOM from 'react-shadow';
 import ErrorBoundry from 'components/ErrorBoundry';
+import MdouleImporter from 'components/MdouleImporter';
 
 // Internal
 import UIController from 'components/UIController';
@@ -33,6 +34,7 @@ import Exchange from './Exchange';
 import AppBackground from './AppBackground';
 import ThemeController from './ThemeController';
 import ModMarket from './ModMarket';
+import ModuleImporter from '../nxs_modules/components/MdouleImporter';
 
 const AppWrapper = styled.div({
   position: 'fixed',
@@ -182,43 +184,16 @@ export default class App extends Component {
                       <Route path="/Exchange" component={Exchange} />
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
-                      {/* component={ModMarket} */}
-                      <Route
-                        exact
-                        path="/ModMarket"
-                        render={props => {
-                          return (
-                            <ShadowDOM {...props}>
-                              <div>Hello World</div>
-                            </ShadowDOM>
-                          );
-                        }}
-                      />
-                      {InstalledModules.map(e => {
-                        console.log(e);
 
-                        console.log(
-                          '--------------------------------',
-                          e.entryFilePath,
-                          global.require(e.entryFilePath)
-                        );
-                        let ThisModule = global.require(e.entryFilePath)
+                      {InstalledModules.map(e => {
+                        let moduleEntry = global.require(e.entryFilePath)
                           .default;
+
                         return (
-                          <ErrorBoundry>
-                            <ShadowDOM>
-                              <div>
-                                <Route
-                                  key={e.routePath}
-                                  exact
-                                  path={e.routePath}
-                                  render={props => {
-                                    return <ThisModule {...props} />;
-                                  }}
-                                />
-                              </div>
-                            </ShadowDOM>
-                          </ErrorBoundry>
+                          <ModuleImporter
+                            key={e.name}
+                            moduleEntry={moduleEntry}
+                          />
                         );
                       })}
                     </Switch>
