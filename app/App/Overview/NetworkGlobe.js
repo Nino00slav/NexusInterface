@@ -169,7 +169,7 @@ export default class NetworkGlobe extends Component {
         )
       );
     }
-    console.log('update');
+
     RPC.PROMISE('getpeerinfo', []).then(payload => {
       var tmp = {};
       var ip = {};

@@ -58,7 +58,6 @@ const mapStateToProps = state => {
 
 class Navigation extends Component {
   render() {
-    console.log(this.props);
     return (
       <Nav>
         <AboveNav>

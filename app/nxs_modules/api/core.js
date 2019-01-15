@@ -36,8 +36,6 @@ var ip = '127.0.0.1';
 var host = 'http://' + ip + ':' + port;
 var verbose = '2'; // <--Lower to 0 after beta ends
 
-// console.log(process.env.APPDATA);configuration.GetAppDataDirectory();
-console.log('core', process.env.HOME);
 //Set data directory by OS for automatic daemon mode
 
 // SetCoreParameters: Get the path to local resources for the application (depending on running packaged vs via npm start)

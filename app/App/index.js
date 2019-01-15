@@ -5,13 +5,6 @@ import { Route, Switch } from 'react-router';
 import { Provider } from 'react-redux';
 // import IntlWrapper from './IntlWrapper';
 import styled from '@emotion/styled';
-//needed for module loading
-import { join } from 'path';
-import configuration from 'api/configuration';
-import { readdirSync, Stats, lstatSync, readFileSync } from 'fs';
-import ShadowDOM from 'react-shadow';
-import ErrorBoundry from 'components/ErrorBoundry';
-import MdouleImporter from 'components/MdouleImporter';
 
 // Internal
 import UIController from 'components/UIController';
@@ -33,8 +26,8 @@ import About from './About';
 import Exchange from './Exchange';
 import AppBackground from './AppBackground';
 import ThemeController from './ThemeController';
-import ModMarket from './ModMarket';
 import ModuleImporter from '../nxs_modules/components/MdouleImporter';
+import ModulePreload from '../nxs_modules/api/ModulePreload';
 
 const AppWrapper = styled.div({
   position: 'fixed',
@@ -67,84 +60,13 @@ const AppLoader = styled.div({
 });
 
 export default class App extends Component {
-  ModulePreloadChecker() {
-    const moduleInstallDir = join(
-      configuration.GetAppDataDirectory(),
-      'Installed_Modules'
-    );
-    const rawInstalled = readdirSync(moduleInstallDir);
-    let elegeableInstalled = [];
-    if (rawInstalled.length > 0) {
-      elegeableInstalled = rawInstalled
-        .filter(e => {
-          if (lstatSync(join(moduleInstallDir, e)).isDirectory()) {
-            let currentMod = readdirSync(join(moduleInstallDir, e));
-            console.log(
-              e,
-              currentMod.includes('index.js'),
-              currentMod.includes('package.json'),
-              currentMod.findIndex(e => {
-                if (e.includes('icon')) return e;
-              })
-            );
-            if (
-              currentMod.includes('index.js') &&
-              currentMod.includes('package.json') &&
-              currentMod.findIndex(e => {
-                if (e.includes('icon')) return e;
-              }) >= 0
-              // this is where we can make validations happen for modules
-            ) {
-              console.log('Valid Module');
-              return e;
-            } else {
-              console.log('Invalid Module, Skipping...');
-            }
-          } else {
-            console.log('Not a Module, Skipping...');
-          }
-        })
-        .map(mod => {
-          // Pulling out relevent information
-          let packageDOTjson = JSON.parse(
-            readFileSync(join(moduleInstallDir, mod, 'package.json'))
-          );
-          let moduleFiles = readdirSync(join(moduleInstallDir, mod));
-
-          return {
-            routePath: `/${mod}-${packageDOTjson.productName}-${
-              packageDOTjson.version
-            }`.replace(' ', '-'),
-            name: packageDOTjson.productName,
-            version: packageDOTjson.version,
-            buildDate: packageDOTjson.buildDate,
-            entryFilePath: join(moduleInstallDir, mod, 'index.js'),
-            iconPath: join(
-              moduleInstallDir,
-              mod,
-              moduleFiles[
-                moduleFiles.findIndex(e => {
-                  if (e.includes('icon')) return e;
-                })
-              ]
-            ),
-          };
-        });
-      console.log(elegeableInstalled);
-    } else {
-      console.log('Install Directory is empty.');
-    }
-    this.props.store.dispatch({
-      type: 'ENABLED_MODULES',
-      payload: elegeableInstalled,
-    });
-    return elegeableInstalled;
-  }
-
   render() {
     const { store, history } = this.props;
-    const InstalledModules = this.ModulePreloadChecker();
-    console.log(store);
+    const InstalledModules = ModulePreload();
+    this.props.store.dispatch({
+      type: 'ENABLED_MODULES',
+      payload: InstalledModules,
+    });
     return (
       <Provider store={store}>
         <ThemeController>

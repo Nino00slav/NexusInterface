@@ -121,7 +121,6 @@
     "electron",
     "react",
     "redux",
-    "sass",
     "webpack"
   ],
   "homepage": "https://github.com/Nexusoft/Nexus-Interface-React/#readme",
