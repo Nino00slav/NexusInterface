@@ -1,3 +1,4 @@
+import React from 'react';
 import UIController from 'components/UIController';
 import * as RPC from 'scripts/rpc';
 import * as ac from 'actions/setupAppActionCreators';
@@ -12,6 +13,7 @@ export default function getInfo() {
       info = await RPC.PROMISE('getinfo', []);
     } catch (err) {
       console.log(err);
+      dispatch(ac.clearOverviewVariables());
       return;
     }
 
@@ -172,6 +174,6 @@ async function loadMyAccounts(dispatch) {
 async function showDesktopNotif(title, message) {
   const result = await Notification.requestPermission();
   if (result === 'granted') {
-    new Notification(title, { body: message });
+    const notif = new Notification(title, { body: message });
   }
 }

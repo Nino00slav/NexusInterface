@@ -9,6 +9,12 @@
   flex: 0;
 }
 
+.AddressThead {
+  position: absolute;
+  margin-top: -5%;
+  width: 95%;
+}
+
 #addressbook > .panel {
   flex: 1;
   overflow-y: auto;
@@ -197,7 +203,7 @@ select {
   border-collapse: collapse;
 }
 .custom-modal4 {
-  background: #282828;
+  background: #1c1d1f;
   /* animation: mymove2 0.5s ease-in-out; */
   height: 550px;
   min-width: 10%;
@@ -235,7 +241,6 @@ select {
 }
 .searchaccount {
   float: right;
-  background: blue;
 }
 @keyframes tdd {
   33% {
@@ -269,6 +274,12 @@ select {
 }
 .m1 {
   margin: 0px;
+  border-bottom: 2px solid var(--color-2);
+  color: var(--color-2);
+  text-align: center;
+  font-size: 24px;
+  font-weight: "bold";
+  padding: 20px 0;
 }
 .chosen {
   color: var(--color-2);

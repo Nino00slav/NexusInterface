@@ -231,10 +231,10 @@ class Overview extends Component {
 
   // React Method (Life cycle hook)
   componentDidUpdate(prevProps) {
-    const { blocks, connections } = this.props;
+    const { blocks, webGLEnabled, settings, connections } = this.props;
 
-    if (this.showingGlobe()) {
-      if (blocks && prevProps.blocks && blocks != prevProps.blocks) {
+    if (settings.acceptedagreement && webGLEnabled && settings.renderGlobe) {
+      if (blocks != prevProps.blocks && blocks && prevProps.blocks) {
         this.redrawCurves();
       }
 
@@ -286,14 +286,12 @@ class Overview extends Component {
   }
 
   trustIcon() {
-    if (!this.props.trustweight) return trustIcons[0];
-    const tw = Math.round(this.props.trustweight / 10);
+    const tw = Math.round((this.props.trustweight || 0) / 10);
     return trustIcons[tw];
   }
 
   blockWeightIcon() {
-    if (!this.props.blockweight) return blockWeightIcons[0];
-    const bw = Math.round(this.props.blockweight / 10);
+    const bw = Math.round((this.props.blockweight || 0) / 10);
     return blockWeightIcons[bw];
   }
 
@@ -396,10 +394,10 @@ class Overview extends Component {
               handleOnAddData={e => (this.reDrawEverything = e)}
               handleRemoveAllPoints={e => (this.removeAllPoints = e)}
               pillarColor={
-                this.props.settings.customStyling.globePillarColorRGB
+                this.props.theme.globePillarColor
               }
-              archColor={this.props.settings.customStyling.globeArchColorRGB}
-              globeColor={this.props.settings.customStyling.globeMultiColorRGB}
+              archColor={this.props.theme.globeArchColor}
+              globeColor={this.props.theme.globeColor}
             />
             <MaxmindCopyright>
               <MaxmindLogo src={maxmindLogo} />

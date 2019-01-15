@@ -21,6 +21,8 @@ let resizeTimer;
 // Global Objects
 global.core = core;
 
+app.setAppUserModelId(APP_ID);
+
 // Configure Updater
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
@@ -48,7 +50,7 @@ const installExtensions = async () => {
 
 function createWindow() {
   // App self-destruct timer
-  const expiration = 1546926000000;
+  const expiration = 1547926000000;
   var presentTime = new Date().getTime();
   var timeLeft = (expiration - presentTime) / 1000 / 60 / 60 / 24;
   if (presentTime >= expiration) {
@@ -130,6 +132,8 @@ function createWindow() {
 
     mainWindow.show();
     mainWindow.focus();
+    // UNCOMMENT THIS TO OPEN DEVTOOLS FROM THE MAIN PROCESS
+    // mainWindow.webContents.openDevTools();
 
     //updateApplication(); // if updates are checked in app.on('ready') there is a chance the event doesn't make it to the UI if that hasn't loaded yet, this is safer
   });

@@ -271,20 +271,34 @@ textarea {
   height: 325px;
   display: block;
   width: 100%;
-  margin-top: 10%;
+  text-align: center;
 }
 
+.tda {
+  animation: tdd 0.5s;
+
+  display: flex;
+
+  text-align: center;
+
+  border-spacing: 0px;
+  border-collapse: collapse;
+}
+.contactNames {
+  color: var(--color-2);
+  animation: tdd 0.5s;
+}
 .short-column {
   width: 10%;
 }
 .long-column {
-  width: 70%;
+  width: 100%;
+  display: flex;
+
+  justify-content: space-between;
 }
 .searchBar {
-  width: 100%;
-  float: right;
-  height: 20px;
-  margin-top: -6.8%;
+  margin-right: 100px;
 }
 .AddressThead {
   position: absolute;
