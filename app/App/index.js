@@ -9,7 +9,6 @@ import styled from '@emotion/styled';
 // Internal
 import UIController from 'components/UIController';
 import GlobalStyles from './GlobalStyles';
-import Loader from './Loader';
 import Overview from './Overview';
 import Header from './Header';
 import Navigation from './Navigation';
@@ -23,7 +22,7 @@ import Terminal from './Terminal';
 import StyleGuide from './StyleGuide';
 import TrustList from './TrustList';
 import About from './About';
-import Exchange from './Exchange';
+// import Exchange from './Exchange';
 import AppBackground from './AppBackground';
 import ThemeController from './ThemeController';
 import ModuleImporter from '../nxs_modules/components/MdouleImporter';
@@ -50,15 +49,6 @@ const Main = styled.main({
   alignItems: 'stretch',
 });
 
-const AppLoader = styled.div({
-  position: 'fixed',
-  top: '50%',
-  left: '50%',
-  width: 300,
-  height: 300,
-  transform: 'translate(-50%,-50%)',
-});
-
 export default class App extends Component {
   render() {
     const { store, history } = this.props;
@@ -75,9 +65,6 @@ export default class App extends Component {
               <div>
                 <GlobalStyles />
                 <AppBackground />
-                <AppLoader>
-                  <Loader />
-                </AppLoader>
                 <AppWrapper>
                   <Header />
                   <Main>
@@ -103,7 +90,7 @@ export default class App extends Component {
                       <Route path="/Settings" component={Settings} />
                       <Route path="/Terminal" component={Terminal} />
                       <Route exact path="/StyleGuide" component={StyleGuide} />
-                      <Route path="/Exchange" component={Exchange} />
+                      {/* <Route path="/Exchange" component={Exchange} /> */}
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
 
