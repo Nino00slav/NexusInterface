@@ -4,12 +4,20 @@ import ErrorBoundry from 'components/ErrorBoundry';
 import { Route } from 'react-router';
 
 export default class ModuleImporter extends Component {
-  builder() {
+  constructor() {
+    super();
+    this.module = <div />;
+  }
+
+  componentDidMount() {
     let rootele = document.createElement('div');
     this.props.moduleEntry(rootele, {
       /* This is where the API will be passed in*/
     });
-    return rootele;
+
+    this.module = (
+      <div ref={element => element && element.appendChild(rootele)} />
+    );
   }
 
   render() {
@@ -19,17 +27,7 @@ export default class ModuleImporter extends Component {
           <Route
             exact
             path={this.props.location.pathname}
-            render={() => {
-              return (
-                <ErrorBoundry>
-                  <div
-                    ref={element =>
-                      element && element.appendChild(this.builder())
-                    }
-                  />
-                </ErrorBoundry>
-              );
-            }}
+            component={() => <ErrorBoundry>{this.module}</ErrorBoundry>}
           />
         </div>
       </ShadowDOM>

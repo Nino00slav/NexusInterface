@@ -50,13 +50,20 @@ const Main = styled.main({
 });
 
 export default class App extends Component {
-  render() {
-    const { store, history } = this.props;
-    const InstalledModules = ModulePreload();
+  constructor() {
+    super();
+    this.InstalledModules = ModulePreload();
+  }
+  componentDidMount() {
     this.props.store.dispatch({
       type: 'ENABLED_MODULES',
-      payload: InstalledModules,
+      payload: this.InstalledModules,
     });
+  }
+
+  render() {
+    const { store, history } = this.props;
+
     return (
       <Provider store={store}>
         <ThemeController>
@@ -94,14 +101,14 @@ export default class App extends Component {
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
 
-                      {InstalledModules.map(e => {
-                        let moduleEntry = global.require(e.entryFilePath)
-                          .default;
+                      {this.InstalledModules.map(e => {
+                        // let moduleEntry = global.require(e.entryFilePath)
+                        //   .default;
 
                         return (
                           <ModuleImporter
                             key={e.name}
-                            moduleEntry={moduleEntry}
+                            moduleEntry={e.moduleImported[0]}
                           />
                         );
                       })}

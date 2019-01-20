@@ -48,6 +48,7 @@ export default () => {
           );
           let moduleFiles = readdirSync(join(moduleInstallDir, mod));
           console.log(packageDOTjson);
+
           return {
             routePath: `/${mod}-${packageDOTjson.productName}-${
               packageDOTjson.version
@@ -67,6 +68,9 @@ export default () => {
             ),
             bugReporting: packageDOTjson.bugs.url,
             author: packageDOTjson.author.name,
+            moduleImported: [
+              global.require(join(moduleInstallDir, mod, 'index.js')).default,
+            ],
           };
         });
       console.log('Elegeable Installed Modules: ', elegeableInstalled);
