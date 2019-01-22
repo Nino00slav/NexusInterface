@@ -48,7 +48,9 @@ export default () => {
           );
           let moduleFiles = readdirSync(join(moduleInstallDir, mod));
           console.log(packageDOTjson);
-
+          console.log(
+            global.require(join(moduleInstallDir, mod, 'index.js')).default
+          );
           return {
             routePath: `/${mod}-${packageDOTjson.productName}-${
               packageDOTjson.version
