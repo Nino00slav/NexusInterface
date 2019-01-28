@@ -11,7 +11,7 @@ import isRunning from 'is-running';
 
 // TODO: Fix circular dependencies core -> configuration -> rpc -> core
 import configuration from 'api/configuration';
-import { GetSettings, SaveSettings } from 'api/settings';
+import { LoadSettings, UpdateSettings } from 'api/settings';
 
 const statusdelay = 1000;
 var prevCoreProcess = 0;
@@ -73,7 +73,7 @@ function SetCoreParameters(settings) {
     settings.verboseLevel === undefined ? verbose : settings.verboseLevel;
 
   var forkblockCount =
-    settings.forkblocks === undefined ? 0 : settings.forkblocks;
+    settings.forkBlocks === undefined ? 0 : settings.forkBlocks;
 
   // Set up parameters for calling the core executable (manual daemon mode simply won't use them)
   parameters.push('-rpcuser=' + user);
@@ -109,8 +109,7 @@ function SetCoreParameters(settings) {
 
   if (forkblockCount !== 0) {
     parameters.push('-forkblocks=' + forkblockCount);
-    settings.forkblocks = 0;
-    SaveSettings(settings);
+    UpdateSettings({ forkBlocks: 0 });
     console.log('Saved New Settings');
   }
 
@@ -382,7 +381,7 @@ class Core extends EventEmitter {
   // start: Start up the core with necessary parameters and return the spawned process
   start(refToThis) {
     var datadir = configuration.GetCoreDataDir();
-    let settings = GetSettings();
+    let settings = LoadSettings();
     let parameters = SetCoreParameters(settings);
     let coreBinaryPath = GetCoreBinaryPath();
     let coreBinaryName = GetCoreBinaryName();
@@ -436,7 +435,7 @@ class Core extends EventEmitter {
   stop(callback, refToThis) {
     return new Promise((resolve, reject) => {
       log.info('Core Manager: Stop function called');
-      let settings = GetSettings();
+      let settings = LoadSettings();
       let coreBinaryName = GetCoreBinaryName();
       let corePID = getCorePID();
       // let coreParentPID = getCoreParentPID();
@@ -498,9 +497,6 @@ class Core extends EventEmitter {
 
   // restart: Restart the core process
   restart() {
-    let settings = GetSettings();
-    settings.keepDaemon = false;
-    SaveSettings(settings);
     var _this = this;
     this.stop(this.start, _this);
   }

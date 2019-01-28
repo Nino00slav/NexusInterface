@@ -4,20 +4,27 @@ import { remote } from 'electron';
 // Internal
 import UIController from 'components/UIController';
 import WEBGL from 'scripts/WebGLCheck.js';
+import * as RPC from 'scripts/rpc';
 import * as ac from 'actions/setupAppActionCreators';
 import getInfo from 'actions/getInfo';
-import MenuBuilder from './menuBuilder';
-import loadSettings from './loadSettings';
-import setupTray from './setupTray';
+import { loadSettingsFromFile } from 'actions/settingsActionCreators';
+import { loadThemeFromFile } from 'actions/themeActionCreators';
+import updater from 'updater';
+import appMenu from 'appMenu';
+import core from 'api/core';
+import LicenseAgreementModal from './LicenseAgreementModal';
+import ExperimentalWarningModal from './ExperimentalWarningModal';
+import ClosingModal from './ClosingModal';
+
+window.remote = remote;
 
 export default function setupApp(store, history) {
   const { dispatch } = store;
-  loadSettings(store);
+  store.dispatch(loadSettingsFromFile());
+  store.dispatch(loadThemeFromFile());
 
-  const menuBuilder = new MenuBuilder(store, history);
-  menuBuilder.buildMenu();
-
-  setupTray(store);
+  appMenu.initialize(store, history);
+  appMenu.build();
 
   dispatch(ac.LoadAddressBook());
 
@@ -32,11 +39,35 @@ export default function setupApp(store, history) {
   checkWebGL(dispatch);
 
   const mainWindow = remote.getCurrentWindow();
-  mainWindow.on('close', e => {
-    e.preventDefault();
-    dispatch(ac.clearOverviewVariables());
-    UIController.showNotification('Closing Nexus...');
+  mainWindow.on('close', async e => {
+    const {
+      settings: { minimizeOnClose, manualDaemon },
+    } = store.getState();
+
+    // forceQuit is set when user clicks Quit option in the Tray context menu
+    if (minimizeOnClose && !remote.getGlobal('forceQuit')) {
+      mainWindow.hide();
+    } else {
+      UIController.openModal(ClosingModal);
+
+      if (manualDaemon) {
+        await RPC.PROMISE('stop', []);
+        remote.app.exit();
+      } else {
+        await core.stop();
+        remote.app.exit();
+      }
+    }
   });
+
+  const state = store.getState();
+
+  updater.setup();
+  if (state.settings.autoUpdate) {
+    updater.autoUpdate();
+  }
+
+  showInitialModals(state);
 }
 
 function checkWebGL(dispatch) {
@@ -45,5 +76,22 @@ function checkWebGL(dispatch) {
   } else {
     dispatch(ac.setWebGLEnabled(false));
     console.error(WEBGL.getWebGLErrorMessage());
+  }
+}
+
+function showInitialModals({ settings }) {
+  const showExperimentalWarning = () => {
+    if (!settings.experimentalWarningDisabled) {
+      UIController.openModal(ExperimentalWarningModal);
+    }
+  };
+
+  if (!settings.acceptedAgreement) {
+    UIController.openModal(LicenseAgreementModal, {
+      fullScreen: true,
+      onClose: showExperimentalWarning,
+    });
+  } else {
+    showExperimentalWarning();
   }
 }

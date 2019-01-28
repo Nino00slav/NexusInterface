@@ -11,6 +11,10 @@ const Svg = styled.svg(
     width: '1em',
     height: '1em',
   },
+  ({ spaceLeft }) =>
+    spaceLeft && {
+      marginLeft: '.4em',
+    },
   ({ spaceRight }) =>
     spaceRight && {
       marginRight: '.4em',
