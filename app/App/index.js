@@ -101,17 +101,22 @@ export default class App extends Component {
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
 
-                      {/* {this.InstalledModules.map(e => {
-                        // let moduleEntry = global.require(e.entryFilePath)
-                        //   .default;
-
+                      {this.InstalledModules.map(e => {
+                        console.log(e.entryFilePath);
                         return (
-                          <ModuleImporter
-                            key={e.name}
-                            moduleEntry={e.moduleImported[0]}
+                          <Route
+                            exact
+                            path={e.routePath}
+                            key={e.entryFilePath}
+                            component={() => (
+                              <ModuleImporter
+                                key={e.name}
+                                moduleEntry={e.entryFilePath}
+                              />
+                            )}
                           />
                         );
-                      })} */}
+                      })}
                     </Switch>
                   </Main>
                   <Navigation />

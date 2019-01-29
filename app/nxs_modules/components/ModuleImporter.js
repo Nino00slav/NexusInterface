@@ -30,14 +30,25 @@ export default class ModuleImporter extends Component {
   //   return html;
   // }
   render() {
+    console.log(this.props);
+    let HTML = readFileSync(
+      this.props.moduleEntry.replace('js', 'html')
+    ).toString();
+
+    console.log(HTML);
     return (
+      // <Route
+      //   exact
+      //   path={this.props.location.pathname}
+      //   component={() => (
+
       <ErrorBoundry>
         <ShadowDOM>
-          <div>
-            <div
+          <div id="entrypoint">
+            {/* <div
               ref={element => {
                 console.log(this.props.moduleEntry);
-                //
+                // 
                 return (
                   element &&
                   global
@@ -45,10 +56,27 @@ export default class ModuleImporter extends Component {
                     .default(element, { ReactDOM: ReactDOM })
                 );
               }}
-            />
-            {/* {console.log(this.props.moduleEntry.replace('js', 'html'))}
+            /> */}
+            {console.log(this.props.moduleEntry.replace('js', 'html'))}
             {existsSync(this.props.moduleEntry.replace('js', 'html')) &&
-              this.htmlLoader()} */}
+              Parser(
+                HTML
+                //   {
+                //   replace: function(domNode) {
+                //     console.log(domNode);
+
+                //     if (domNode.name === 'script') {
+                //       return (
+                //         <div />
+                //         // <Script
+                //         //   url="/home/dillon/.config/Nexus_Wallet_BETA_v0.8.5/Installed_Modules/TestModule2/index.js"
+                //         //   onLoad={console.log('Hello')}
+                //         // />
+                //       );
+                //     }
+                //   },
+                // }
+              )}
           </div>
         </ShadowDOM>
       </ErrorBoundry>
