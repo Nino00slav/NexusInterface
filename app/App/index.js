@@ -25,7 +25,7 @@ import About from './About';
 // import Exchange from './Exchange';
 import AppBackground from './AppBackground';
 import ThemeController from './ThemeController';
-import ModuleImporter from '../nxs_modules/components/ModuleImporter';
+import ModuleImporter from '../nxs_modules/components/MdouleImporter';
 import ModulePreload from '../nxs_modules/api/ModulePreload';
 
 const AppWrapper = styled.div({
@@ -101,67 +101,17 @@ export default class App extends Component {
                       <Route exact path="/List" component={TrustList} />
                       <Route exact path="/About" component={About} />
 
-                      {this.InstalledModules.map(e => {
-                        // e.moduleEntry = global.require(e.entryFilePath).default;
-                        console.log(e.entryFilePath);
+                      {/* {this.InstalledModules.map(e => {
+                        // let moduleEntry = global.require(e.entryFilePath)
+                        //   .default;
+
                         return (
-                          <Route
-                            exact
-                            path={e.routePath}
-                            component={() => (
-                              <ModuleImporter
-                                key={e.name}
-                                moduleEntry={e.entryFilePath}
-                              />
-                              // // <ErrorBoundry>
-                              // <div
-                              //   ref={element => {
-                              //     console.log(e.entryFilePath);
-                              //     return (
-                              //       element &&
-                              //       global
-                              //         .require(e.entryFilePath)
-                              //         .default(element)
-                              //     );
-                              //   }}
-                              // />
-                              // // </ErrorBoundry>
-                            )}
+                          <ModuleImporter
+                            key={e.name}
+                            moduleEntry={e.moduleImported[0]}
                           />
                         );
-                      })}
-                      {console.log(
-                        'routes generated',
-                        this.InstalledModules.map(e => {
-                          // e.moduleEntry = global.require(e.entryFilePath).default;
-                          console.log(e.entryFilePath);
-                          return (
-                            <Route
-                              exact
-                              path={e.routePath}
-                              component={() => (
-                                // <ErrorBoundry>
-                                <div
-                                  ref={element => {
-                                    console.log(e.entryFilePath);
-                                    return (
-                                      element &&
-                                      global
-                                        .require(e.entryFilePath)
-                                        .default(element)
-                                    );
-                                  }}
-                                />
-                                // </ErrorBoundry>
-                              )}
-                            />
-                            // <ModuleImporter
-                            //   key={e.name}
-                            //   moduleEntry={e.entryFilePath}
-                            // />
-                          );
-                        })
-                      )}
+                      })} */}
                     </Switch>
                   </Main>
                   <Navigation />

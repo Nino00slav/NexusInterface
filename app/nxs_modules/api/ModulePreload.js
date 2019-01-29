@@ -48,9 +48,9 @@ export default () => {
           );
           let moduleFiles = readdirSync(join(moduleInstallDir, mod));
           console.log(packageDOTjson);
-          console.log(
-            global.require(join(moduleInstallDir, mod, 'index.js')).default
-          );
+          // console.log(
+          //   global.require(join(moduleInstallDir, mod, 'index.js')).default
+          // );
           return {
             routePath: `/${mod}-${packageDOTjson.productName}-${
               packageDOTjson.version
@@ -70,9 +70,9 @@ export default () => {
             ),
             bugReporting: packageDOTjson.bugs.url,
             author: packageDOTjson.author.name,
-            moduleImported: [
-              global.require(join(moduleInstallDir, mod, 'index.js')).default,
-            ],
+            // moduleImported: [
+            //   global.require(join(moduleInstallDir, mod, 'index.js')).default,
+            // ],
           };
         });
       console.log('Elegeable Installed Modules: ', elegeableInstalled);
@@ -81,10 +81,15 @@ export default () => {
     }
     return elegeableInstalled;
   } catch (e) {
-    console.log(
-      'Install Directory does not exist. \n Creating install directory...'
-    );
-    mkdirSync(moduleInstallDir);
+    console.log(e);
+    try {
+      console.log(
+        'Install Directory does not exist. \n Creating install directory...'
+      );
+      mkdirSync(moduleInstallDir);
+    } catch (e) {
+      console.log(e);
+    }
     return [];
   }
 };
