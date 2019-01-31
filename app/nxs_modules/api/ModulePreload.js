@@ -70,9 +70,9 @@ export default () => {
             ),
             bugReporting: packageDOTjson.bugs.url,
             author: packageDOTjson.author.name,
-            // moduleImported: [
-            //   global.require(join(moduleInstallDir, mod, 'index.js')).default,
-            // ],
+            moduleImported: [
+              global.require(join(moduleInstallDir, mod, 'index.js')).default,
+            ],
           };
         });
       console.log('Elegeable Installed Modules: ', elegeableInstalled);

@@ -25,8 +25,10 @@ import About from './About';
 // import Exchange from './Exchange';
 import AppBackground from './AppBackground';
 import ThemeController from './ThemeController';
-import ModuleImporter from '../nxs_modules/components/MdouleImporter';
+import ModuleImporter from 'components/ModuleImporter';
 import ModulePreload from '../nxs_modules/api/ModulePreload';
+
+import ShadowDOM from 'react-shadow';
 
 const AppWrapper = styled.div({
   position: 'fixed',
@@ -102,7 +104,7 @@ export default class App extends Component {
                       <Route exact path="/About" component={About} />
 
                       {this.InstalledModules.map(e => {
-                        console.log(e.entryFilePath);
+                        console.log('Index:', e.entryFilePath);
                         return (
                           <Route
                             exact
@@ -112,6 +114,8 @@ export default class App extends Component {
                               <ModuleImporter
                                 key={e.name}
                                 moduleEntry={e.entryFilePath}
+                                importedModule={e.moduleImported[0]}
+                                otherProps={{ ...this.props }}
                               />
                             )}
                           />
