@@ -51,6 +51,13 @@ const Main = styled.main({
   alignItems: 'stretch',
 });
 
+/**
+ * Main App Page
+ *
+ * @export
+ * @class App
+ * @extends {Component}
+ */
 export default class App extends Component {
   constructor() {
     super();
@@ -63,6 +70,12 @@ export default class App extends Component {
     });
   }
 
+  /**
+   * React Render
+   *
+   * @returns
+   * @memberof App
+   */
   render() {
     const { store, history } = this.props;
 
@@ -100,7 +113,7 @@ export default class App extends Component {
                       <Route path="/Terminal" component={Terminal} />
                       <Route exact path="/StyleGuide" component={StyleGuide} />
                       {/* <Route path="/Exchange" component={Exchange} /> */}
-                      <Route exact path="/List" component={TrustList} />
+                      {/* <Route exact path="/List" component={TrustList} /> */}
                       <Route exact path="/About" component={About} />
 
                       {this.InstalledModules.map(e => {

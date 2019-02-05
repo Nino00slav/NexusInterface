@@ -18,8 +18,6 @@ const mapStateToProps = state => {
   return { ...state.terminal, ...state.common, settings: state.settings };
 };
 const mapDispatchToProps = dispatch => ({
-  printCoreOutput: data =>
-    dispatch({ type: TYPE.PRINT_TO_CORE, payload: data }),
   setCoreOutputPaused: isPaused =>
     dispatch({ type: TYPE.SET_PAUSE_CORE_OUTPUT, payload: isPaused }),
 });
@@ -57,44 +55,22 @@ const OutputLine = styled.code(({ theme }) => ({
   borderColor: theme.background,
 }));
 
+/**
+ * Terminal Core page in the Terminal Page
+ *
+ * @class TerminalCore
+ * @extends {Component}
+ */
 class TerminalCore extends Component {
   constructor(props) {
     super(props);
-    this.debugFileLocation = '';
   }
   // React Method (Life cycle hook)
   componentDidMount() {
-    if (this.props.settings.manualDaemon == true) {
-      return;
-    }
-    let datadir = configuration.GetCoreDataDir();
-    const electronapp =
-      require('electron').app || require('electron').remote.app;
-
-    var debugfile;
-    if (process.platform === 'win32') {
-      debugfile = datadir + '\\debug.log';
-    } else {
-      debugfile = datadir + '/debug.log';
-    }
-    this.debugFileLocation = debugfile;
-    fs.stat(this.debugFileLocation, this.checkDebugFileExists.bind(this));
-    this.checkIfFileExistsInterval = setInterval(() => {
-      if (this.tail != undefined) {
-        clearInterval(this.checkIfFileExistsInterval);
-        return;
-      }
-      fs.stat(this.debugFileLocation, this.checkDebugFileExists.bind(this));
-    }, 5000);
   }
 
   // todo finish
   componentWillUnmount() {
-    if (this.tail != undefined) {
-      this.tail.unwatch();
-    }
-    clearInterval(this.printCoreOutputTimer);
-    clearInterval(this.checkIfFileExistsInterval);
   }
 
   // React Method (Life cycle hook)
@@ -102,17 +78,18 @@ class TerminalCore extends Component {
     if (this.props.rpcCallList.length != nextProps.rpcCallList.length) {
       this.forceUpdate();
     }
-  }
-
-  checkDebugFileExists(err, stat) {
-    console.log(this);
-    if (err == null) {
-      this.processDeamonOutput(this.debugFileLocation);
-      clearInterval(this.checkIfFileExistsInterval);
-    } else {
+    if (this.props.coreOutput.length != nextProps.coreOutput.length)
+    {
+      this.outputRef.childNodes[0].scrollTop = this.outputRef.childNodes[0].scrollHeight;
     }
   }
 
+  /**
+   * Handle on Scroll
+   *
+   * @returns
+   * @memberof TerminalCore
+   */
   onScrollEvent() {
     const bottomPos =
       this.outputRef.childNodes[0].scrollHeight -
@@ -127,31 +104,14 @@ class TerminalCore extends Component {
     }
   }
 
-  // Class Methods
-  processDeamonOutput(debugfile) {
-    const tailOptions = {
-      useWatchFile: true,
-    };
-    this.tail = new Tail(debugfile, tailOptions);
-    let n = 0;
-    let batch = [];
-    this.tail.on('line', d => {
-      batch.push(d);
-    });
-    this.printCoreOutputTimer = setInterval(() => {
-      if (this.props.coreOutputPaused) {
-        return;
-      }
-      if (batch.length == 0) {
-        return;
-      }
-      this.props.printCoreOutput(batch);
-      batch = [];
-      this.outputRef.childNodes[0].scrollTop = this.outputRef.childNodes[0].scrollHeight;
-    }, 1000);
-  }
-
+  
   // Mandatory React method
+  /**
+   * React Render
+   *
+   * @returns
+   * @memberof TerminalCore
+   */
   render() {
     return (
       <TerminalContent>
@@ -172,7 +132,6 @@ class TerminalCore extends Component {
                 skin="filled-dark"
                 fullWidth
                 onClick={() => {
-                  console.log(this.props);
                   this.props.setCoreOutputPaused(!this.props.coreOutputPaused);
                 }}
                 style={{ flexShrink: 0 }}

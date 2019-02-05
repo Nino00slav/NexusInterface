@@ -26,13 +26,32 @@ const Option = styled.label(
     }
 );
 
+/**
+ * The Background Picker Element
+ *
+ * @class BackgroundPicker
+ * @extends {Component}
+ */
 class BackgroundPicker extends Component {
   fileInputID = newUID();
 
-  setDefault = () => {
-    this.props.onChange(null);
+  /**
+   * Set a Default background
+   *
+   * @memberof BackgroundPicker
+   */
+  setDefault = (version) => {
+    if (this.props.defaultStyle != version) {
+      version = version + 'Custom';
+    }
+    this.props.onChange(null, version);
   };
 
+  /**
+   * Handle Picking a file
+   *
+   * @memberof BackgroundPicker
+   */
   handleFilePick = e => {
     if (!!e.target.files.length) {
       let imagePath = e.target.files[0].path;
@@ -40,20 +59,33 @@ class BackgroundPicker extends Component {
         imagePath = imagePath.replace(/\\/g, '/');
       }
       console.log(imagePath);
-      this.props.onChange(imagePath);
+      this.props.onChange(imagePath, 'Custom');
     }
   };
 
+  /**
+   * React Render
+   *
+   * @returns
+   * @memberof BackgroundPicker
+   */
   render() {
-    const { wallpaper } = this.props;
+    const { wallpaper, defaultStyle } = this.props;
     return (
       <div>
         <Option
-          onClick={this.setDefault}
-          selected={!wallpaper}
-          style={{ marginBottom: '.5em' }}
+          onClick={() => this.setDefault('Dark')}
+          selected={!wallpaper && defaultStyle.startsWith('Dark')}
+          style={{ display: 'inline', marginBottom: '.5em' }}
         >
           <Text id="Settings.StarryBackground" />
+        </Option>
+        <Option
+          onClick={() => this.setDefault('Light')}
+          selected={!wallpaper && defaultStyle.startsWith('Light')}
+          style={{ display: 'inline', marginBottom: '.5em' }}
+        >
+          <Text id="Settings.LightBackground" />
         </Option>
         <Option htmlFor={this.fileInputID} selected={!!wallpaper}>
           {wallpaper ? (
