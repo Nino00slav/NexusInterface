@@ -6,7 +6,7 @@ import { Route } from 'react-router';
 import { readFileSync, existsSync } from 'fs';
 import Parser from 'html-react-parser';
 import Script from 'react-load-script';
-import ModuleEncapsulater from 'components/ModuleEncapsulater';
+
 import Loadable from 'react-loadable';
 import fs from 'fs';
 
@@ -26,9 +26,10 @@ export default class ModuleImporter extends Component {
               ref={element => {
                 this.mountRoot = element;
                 // this.mountRoot.innerHtml = '';
+                console.log('ele in ref:', element);
                 return (
                   element &&
-                  this.props.importedModule(this.mountRoot, {
+                  this.props.importedModule(element, {
                     fs: fs,
                   })
                 );
