@@ -3,7 +3,7 @@ class ModuleEncapsulater extends HTMLElement {
     super();
     const mountPoint = document.createElement('span');
     this.shadow = this.createShadowRoot().appendChild(mountPoint);
-    this.shadow.innerHTML = '<h1>Loading...</h1>';
+    // this.shadow.innerHTML = '<h1>Loading...</h1>';
 
     console.log(this.shadow);
   }
@@ -14,11 +14,13 @@ class ModuleEncapsulater extends HTMLElement {
 
   connectedCallback() {
     // const mountPoint = document.createElement('span');
-    // this.attachShadow({ mode: 'open' }).appendChild(mountPoint);
+    // this.shadow = this.attachShadow({ mode: 'open' }).appendChild(mountPoint);
     console.log('connected');
   }
 
   disconnectedCallback() {
+    // this.shadow = null;
+    // this.shadow = this.createShadowRoot().appendChild(mountPoint);
     console.log('disconnected');
   }
 }

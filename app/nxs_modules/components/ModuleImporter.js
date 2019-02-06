@@ -8,45 +8,37 @@ import Parser from 'html-react-parser';
 import Script from 'react-load-script';
 import ModuleEncapsulater from 'components/ModuleEncapsulater';
 import Loadable from 'react-loadable';
+import fs from 'fs';
 
 export default class ModuleImporter extends Component {
-  componentDidMount() {
-    // global
-    //   .require(this.props.moduleEntry)
-    //   .default
-    this.props.importedModule(ModuleEncapsulater.shadowRoot, {
-      ReactDOM: ReactDOM,
-    });
+  constructor() {
+    super();
+    this.mountRoot;
   }
 
   render() {
     console.log(this.props.otherProps);
     return (
       <ErrorBoundry>
-        {/* <ShadowDOM> */}
-        {/* <div>
+        <ShadowDOM>
+          <div>
             <div
               ref={element => {
-                console.log(element);
-
+                this.mountRoot = element;
+                // this.mountRoot.innerHtml = '';
                 return (
                   element &&
-                  global.require(this.props.moduleEntry).default(element, {
-                    ReactDOM: ReactDOM,
+                  this.props.importedModule(this.mountRoot, {
+                    fs: fs,
                   })
                 );
               }}
             />
-          </div> */}
-        <div
-          ref={element => {
-            console.log(element);
-
-            return element && element.append(ModuleEncapsulater);
-          }}
-        />
-        {/* </ShadowDOM> */}
-        {console.log(ModuleEncapsulater.shadowRoot)}
+            {this.props.importedModule(this.mountRoot, {
+              fs: fs,
+            })}
+          </div>
+        </ShadowDOM>
       </ErrorBoundry>
     );
   }
