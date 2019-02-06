@@ -9,6 +9,8 @@ import { updateSettings } from 'actions/settingsActionCreators';
 import { backupWallet } from 'api/wallet';
 import SettingsField from 'components/SettingsField';
 import Button from 'components/Button';
+import DragDrop from 'components/DragDrop';
+
 import TextField from 'components/TextField';
 import Select from 'components/Select';
 import Switch from 'components/Switch';
@@ -154,7 +156,13 @@ class SettingsApp extends Component {
     return (
       <AppSettings>
         <LanguageSetting />
-
+        <SettingsField
+          connectLabel
+          label="Import Module Data"
+          subLabel="Come get Your Shit "
+        >
+          <DragDrop />
+        </SettingsField>
         <SettingsField
           connectLabel
           label={<Text id="Settings.MinimizeClose" />}
