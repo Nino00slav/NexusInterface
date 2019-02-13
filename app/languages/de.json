@@ -191,6 +191,14 @@
   "Settings.ManualDaemonExit": "Manuellen Daemon-Modus verlassen?",
   "Settings.ManualDaemonWarning": "(Dadurch wird Ihr Daemon heruntergefahren)",
   "Settings.Folder": "Sicherungsverzeichnis",
+  "Settings.SetFee": "Übernehmen",
+  "Settings.Browse": "Suchen",
+  "Settings.DarkTheme": "Dark",
+  "Settings.LightTheme": "Light",
+  "Settings.CustomTheme": "Erweitert",
+  "Settings.ResetTheme": "Zurücksetzen",
+  "Settings.ExportTheme": "Design exportiert",
+  "Settings.ResetTheme": "Design wurde zurückgesetzt",
 
   "Settings.IpAddress": "IP Adresse",
   "Settings.Port": "Hafen",
@@ -286,15 +294,10 @@
   "Exchange.TradeUnMet": "Handel Minimum nicht erfüllt",
 
   "Footer.Overview": "Überblick",
-  "Footer.Send": "Senden",
-  "Footer.Nexus": "NXS",
-
+  "Footer.SendNXS": "Nexus Senden",
   "Footer.Transactions": "Transaktionen",
-  "Footer.Market": "Markt",
-  "Footer.Data": "Daten",
-  "Footer.Address": "Adresse",
-  "Footer.Book": "Buch",
-
+  "Footer.MarketData": "Marktdaten",
+  "Footer.AddressBook": "Adressbuch",
   "Footer.Settings": "Einstellungen",
   "Footer.Console": "Konsole",
   "Footer.Exchange": "Austausch",
